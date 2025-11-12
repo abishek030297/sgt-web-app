@@ -1,0 +1,104 @@
+<div class="container mt-4">
+  @if (loading) {
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Loading report...</p>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (error) {
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-danger text-center">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ error }}
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (report && !loading) {
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <!-- Report Header -->
+            <div class="text-center mb-4">
+              <h4 class="mb-1">SGT</h4>
+              <p class="mb-1">On</p>
+              <p class="mb-1">Sat</p>
+              <h5 class="mb-1">Gold Testing</h5>
+              <p class="mb-1">R.C Street, Marchandam.</p>
+              <h5 class="mb-3">ASSAYING REPORT</h5>
+            </div>
+
+            <hr>
+
+            <!-- Report Table -->
+            <table class="table table-bordered mb-4">
+              <thead>
+                <tr>
+                  <th>Metal</th>
+                  <th>Name</th>
+                  <th>Fineness%</th>
+                  <th>Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ report.metal_type }}</td>
+                  <td>{{ report.customer_name }}</td>
+                  <td>{{ report.fineness }}</td>
+                  <td>{{ report.weight }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <hr>
+
+            <!-- Report Details -->
+            <div class="row mb-4">
+              <div class="col-6">
+                <strong>SL No.:</strong> {{ report.serial_no }}
+              </div>
+              <div class="col-6 text-end">
+                <strong>Date:</strong> {{ formatDate(report.assay_date) }}
+              </div>
+            </div>
+
+            <!-- Notes -->
+            @if (report.notes) {
+              <div class="mb-4">
+                <strong>Notes:</strong>
+                <p class="mb-0">{{ report.notes }}</p>
+              </div>
+            }
+
+            <!-- Footer -->
+            <div class="mt-4">
+              <p class="small mb-1">
+                Our Method is Five Assay method as per International Standard.
+              </p>
+              <p class="small mb-0">
+                Note: We are not responsible for any error in Assaying Results.
+              </p>
+            </div>
+
+            <!-- Print Button -->
+            <div class="text-center mt-4 no-print">
+              <button class="btn btn-primary" (click)="printReport()">
+                <i class="fas fa-print me-1"></i>Print Report
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

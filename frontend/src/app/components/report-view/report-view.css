@@ -1,0 +1,26 @@
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  body {
+    background: white !important;
+  }
+  
+  .container {
+    max-width: none !important;
+  }
+}
+
+.card {
+  font-family: 'Courier New', monospace;
+}
+
+table {
+  font-size: 0.9rem;
+}

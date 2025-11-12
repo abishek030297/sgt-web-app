@@ -1,0 +1,32 @@
+.report-preview {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.375rem;
+}
+
+.report-preview table {
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.report-preview hr {
+  margin: 0.5rem 0;
+  border-color: #000;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .report-preview {
+    background: white !important;
+  }
+}

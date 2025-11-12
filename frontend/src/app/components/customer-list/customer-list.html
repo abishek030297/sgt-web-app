@@ -1,0 +1,174 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+          <i class="fas fa-users me-2"></i>Customers
+        </h2>
+        <button class="btn btn-primary" (click)="showAddForm = true" [disabled]="showAddForm">
+          <i class="fas fa-plus me-1"></i>Add Customer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Customer Form -->
+  @if (showAddForm || editingCustomer) {
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              {{ editingCustomer ? 'Edit Customer' : 'Add New Customer' }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <form #customerForm="ngForm">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Name *</label>
+                    <input type="text" class="form-control" [(ngModel)]="customerFormData.name" 
+                           name="name" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" [(ngModel)]="customerFormData.phone" 
+                           name="phone">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" [(ngModel)]="customerFormData.email" 
+                           name="email">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">ID Type</label>
+                    <select class="form-control" [(ngModel)]="customerFormData.id_type" name="id_type">
+                      <option value="">Select ID Type</option>
+                      <option value="Passport">Passport</option>
+                      <option value="Driver License">Driver License</option>
+                      <option value="National ID">National ID</option>
+                      <option value="Aadhar">Aadhar</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">ID Number</label>
+                    <input type="text" class="form-control" [(ngModel)]="customerFormData.id_number" 
+                           name="id_number">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control" [(ngModel)]="customerFormData.address" 
+                           name="address">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-2">
+                <button class="btn btn-success" (click)="saveCustomer()" [disabled]="!customerFormData.name">
+                  <i class="fas fa-save me-1"></i>
+                  {{ editingCustomer ? 'Update' : 'Save' }} Customer
+                </button>
+                <button class="btn btn-secondary" (click)="cancelEdit()">
+                  <i class="fas fa-times me-1"></i>Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Success/Error Messages -->
+  @if (message) {
+    <div class="alert" [class]="messageType === 'success' ? 'alert-success' : 'alert-danger'">
+      {{ message }}
+    </div>
+  }
+
+  @if (loading) {
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>ID Type</th>
+                    <th>ID Number</th>
+                    <th>Address</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (customer of customers; track customer.id) {
+                    <tr>
+                      <td>{{ customer.id }}</td>
+                      <td>{{ customer.name }}</td>
+                      <td>{{ customer.phone || '-' }}</td>
+                      <td>{{ customer.email || '-' }}</td>
+                      <td>{{ customer.id_type || '-' }}</td>
+                      <td>{{ customer.id_number || '-' }}</td>
+                      <td>{{ customer.address || '-' }}</td>
+                      <td>{{ customer.created_at | date:'short' }}</td>
+                      <td>
+                        <div class="btn-group btn-group-sm">
+                          <button class="btn btn-outline-primary" (click)="editCustomer(customer)"
+                                  title="Edit Customer">
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="btn btn-outline-danger" (click)="deleteCustomer(customer.id)"
+                                  title="Delete Customer">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                  @if (customers.length === 0) {
+                    <tr>
+                      <td colspan="9" class="text-center">No customers found</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

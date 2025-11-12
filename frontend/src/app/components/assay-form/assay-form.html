@@ -1,0 +1,287 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-file-alt me-2"></i>Create Assay Report
+      </h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Assay Information</h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="assayForm" (ngSubmit)="onSubmit()">
+            <!-- Success Message -->
+            @if (successMessage && successMessage.includes('successfully')) {
+              <div class="alert alert-success">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ successMessage }}
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="downloadQRCode()">
+                      <i class="fas fa-download me-1"></i>Download QR
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-success" (click)="printReport()">
+                      <i class="fas fa-print me-1"></i>Print Report
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- QR Code Display -->
+                @if (qrCodeUrl) {
+                  <div class="text-center mt-3">
+                    <p class="mb-2"><strong>Customer QR Code</strong></p>
+                    <img [src]="qrCodeUrl" alt="QR Code" class="img-fluid border rounded" style="max-width: 200px;">
+                    <p class="small text-muted mt-2">
+                      Scan this QR code to view the report online
+                    </p>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (successMessage && successMessage.includes('Error')) {
+              <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ successMessage }}
+              </div>
+            }
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="customer_id" class="form-label">Customer</label>
+                  <select 
+                    class="form-control" 
+                    id="customer_id" 
+                    formControlName="customer_id"
+                    [class.is-invalid]="assayForm.get('customer_id')?.invalid && assayForm.get('customer_id')?.touched">
+                    <option value="">Select Customer</option>
+                    @for (customer of customers; track customer.id) {
+                      <option [value]="customer.id">
+                        {{ customer.name }} - {{ customer.phone }}
+                      </option>
+                    }
+                  </select>
+                  @if (assayForm.get('customer_id')?.invalid && assayForm.get('customer_id')?.touched) {
+                    <div class="invalid-feedback">
+                      Customer is required
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="serial_no" class="form-label">Serial Number</label>
+                  <div class="input-group">
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="serial_no" 
+                      formControlName="serial_no"
+                      [class.is-invalid]="assayForm.get('serial_no')?.invalid && assayForm.get('serial_no')?.touched">
+                    <button 
+                      type="button" 
+                      class="btn btn-outline-secondary" 
+                      (click)="generateSerialNo()">
+                      Generate
+                    </button>
+                  </div>
+                  @if (assayForm.get('serial_no')?.invalid && assayForm.get('serial_no')?.touched) {
+                    <div class="invalid-feedback">
+                      Serial number is required
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="metal_type" class="form-label">Metal Type</label>
+                  <select 
+                    class="form-control" 
+                    id="metal_type" 
+                    formControlName="metal_type">
+                    <option value="Gold">Gold</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Platinum">Platinum</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="fineness" class="form-label">Fineness (%)</label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    class="form-control" 
+                    id="fineness" 
+                    formControlName="fineness"
+                    placeholder="91.70"
+                    [class.is-invalid]="assayForm.get('fineness')?.invalid && assayForm.get('fineness')?.touched">
+                  @if (assayForm.get('fineness')?.invalid && assayForm.get('fineness')?.touched) {
+                    <div class="invalid-feedback">
+                      Valid fineness percentage is required (0-100)
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="weight" class="form-label">Weight</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="weight" 
+                    formControlName="weight"
+                    placeholder="0.50 ml"
+                    [class.is-invalid]="assayForm.get('weight')?.invalid && assayForm.get('weight')?.touched">
+                  @if (assayForm.get('weight')?.invalid && assayForm.get('weight')?.touched) {
+                    <div class="invalid-feedback">
+                      Weight is required
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="assay_date" class="form-label">Assay Date</label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="assay_date" 
+                    formControlName="assay_date"
+                    [class.is-invalid]="assayForm.get('assay_date')?.invalid && assayForm.get('assay_date')?.touched">
+                  @if (assayForm.get('assay_date')?.invalid && assayForm.get('assay_date')?.touched) {
+                    <div class="invalid-feedback">
+                      Assay date is required
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="notes" class="form-label">Notes</label>
+              <textarea 
+                class="form-control" 
+                id="notes" 
+                rows="3" 
+                formControlName="notes"
+                placeholder="Additional notes about the assay..."></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="assayForm.invalid || loading">
+                @if (loading) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                <i class="fas fa-save me-1"></i>Create Assay Report
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="resetForm()">
+                <i class="fas fa-redo me-1"></i>Reset Form
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- QR Code Preview -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-qrcode me-2"></i>QR Code Preview
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          @if (qrCodeUrl) {
+            <img [src]="qrCodeUrl" alt="QR Code" class="img-fluid mb-3">
+            <p class="small text-muted">
+              Customers can scan this code to view their report online
+            </p>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-primary btn-sm" (click)="downloadQRCode()">
+                <i class="fas fa-download me-1"></i>Download QR
+              </button>
+            </div>
+          } @else {
+            <div class="text-muted">
+              <i class="fas fa-qrcode fa-3x mb-3"></i>
+              <p>QR code will appear here after report creation</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Report Preview -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Report Preview</h5>
+        </div>
+        <div class="card-body">
+          <div class="report-preview">
+            <div class="text-center">
+              <h6 class="mb-1">SGT</h6>
+              <p class="mb-1 small">On</p>
+              <p class="mb-1 small">Sat</p>
+              <h6 class="mb-1">Gold Testing</h6>
+              <p class="mb-1 small">R.C Street, Marchandam.</p>
+              <h6 class="mb-2">ASSAYING REPORT</h6>
+              
+              <hr class="my-2">
+              
+              <table class="table table-sm table-bordered">
+                <thead>
+                  <tr>
+                    <th>Metal</th>
+                    <th>Name</th>
+                    <th>Fineness%</th>
+                    <th>Weight</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ assayForm.get('metal_type')?.value || 'Gold' }}</td>
+                    <td>{{ getCustomerName(assayForm.get('customer_id')?.value) || 'Customer' }}</td>
+                    <td>{{ assayForm.get('fineness')?.value || '0.00' }}</td>
+                    <td>{{ assayForm.get('weight')?.value || '0.00 ml' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <hr class="my-2">
+              
+              <div class="row small">
+                <div class="col-6 text-start">
+                  <strong>SL No.:</strong> {{ assayForm.get('serial_no')?.value || '---' }}
+                </div>
+                <div class="col-6 text-end">
+                  <strong>Date:</strong> {{ (assayForm.get('assay_date')?.value | date:'dd.MM.yyyy') || '---' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

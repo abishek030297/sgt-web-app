@@ -1,0 +1,98 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+      </h2>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="row">
+      <!-- Stats Cards -->
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="card-title">{{ stats.totalReports }}</h4>
+                <p class="card-text">Total Reports</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-file-alt fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-success text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="card-title">{{ stats.totalCustomers }}</h4>
+                <p class="card-text">Total Customers</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-users fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Reports -->
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Recent Assay Reports</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Serial No</th>
+                    <th>Customer</th>
+                    <th>Metal Type</th>
+                    <th>Fineness</th>
+                    <th>Weight</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (report of stats.recentReports; track report.id) {
+                    <tr>
+                      <td>{{ report.serial_no }}</td>
+                      <td>{{ report.customer_name }}</td>
+                      <td>{{ report.metal_type }}</td>
+                      <td>{{ report.fineness }}%</td>
+                      <td>{{ report.weight }}</td>
+                      <td>{{ report.assay_date | date }}</td>
+                    </tr>
+                  }
+                  @if (stats.recentReports.length === 0) {
+                    <tr>
+                      <td colspan="6" class="text-center">No reports found</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

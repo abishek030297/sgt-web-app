@@ -1,0 +1,69 @@
+/* Global Styles */
+:root {
+  --primary: #d4af37;
+  --primary-dark: #b8941f;
+  --secondary: #2c3e50;
+  --light: #f8f9fa;
+  --dark: #343a40;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #17a2b8;
+}
+
+body {
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+/* Report Styles */
+.report-preview {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.report-preview table {
+  font-size: 0.8rem;
+}
+
+/* QR Code Styles */
+.qr-code-container {
+  text-align: center;
+  padding: 1rem;
+}
+
+.qr-code-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
