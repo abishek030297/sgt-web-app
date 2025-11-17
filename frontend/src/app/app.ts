@@ -11,7 +11,7 @@ import { AuthService } from './services/auth.service';
   styleUrls: ['./app.css']
 })
 export class AppComponent {
-  title = 'Gold Assay System';
+  title = 'SGT Gold Assay System';
 
   constructor(public authService: AuthService) {}
 }

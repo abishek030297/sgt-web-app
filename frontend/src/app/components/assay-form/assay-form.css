@@ -16,6 +16,16 @@
   border-color: #000;
 }
 
+.company-logo {
+  height: 40px;
+  margin-right: 8px;
+  scale: 1.5;
+}
+
+.report-header {
+  padding: 10px 20px;
+}
+
 @media print {
   .no-print {
     display: none !important;

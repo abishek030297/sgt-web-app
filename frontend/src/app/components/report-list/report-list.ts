@@ -71,45 +71,72 @@ export class ReportListComponent implements OnInit {
               table { width: 100%; border-collapse: collapse; margin: 20px 0; }
               th, td { border: 1px solid #000; padding: 8px; text-align: left; }
               .footer { margin-top: 50px; font-size: 12px; }
+              .d-flex { display: flex; }
+              .justify-content-center { justify-content: center; }
+              .align-items-center { align-items: center; }
+              .flex-column { flex-direction: column; }
+              .flex-fill { flex: 1; }
+              .text-muted { color: #6c757d; }
+              .small { font-size: 0.875em; }
+              .text-center { text-align: center; }
+              .report-header { padding: 10px 20px; }
+              .company-logo { height: 40px; margin-right: 8px; scale: 1.5; }
             </style>
           </head>
           <body>
-            <div class="header">
-              <h2>SGT</h2>
-              <p>On</p>
-              <p>Sat</p>
-              <h3>Gold Testing</h3>
-              <p>R.C Street, Marchandam.</p>
-              <h3>ASSAYING REPORT</h3>
-            </div>
-            <hr>
-            <table>
+            <table class="table table-sm table-bordered">
               <thead>
                 <tr>
-                  <th>Metal</th>
-                  <th>Name</th>
-                  <th>Fineness%</th>
-                  <th>Weight</th>
+                  <th colspan="4">
+                    <div class="d-flex justify-content-center align-items-center report-header">
+                      <img src="../../../../../assets/sgt_logo.png" alt="SGT Logo" class="company-logo">
+                      <div class="d-flex flex-column flex-fill text-center">
+                        <span>Om Sai Gold Testing</span>
+                        <span class="text-muted small">RC street, Marthandam</span>
+                      </div>
+                      <div class="d-flex flex-column">
+                        <span>9597699733</span>
+                        <span>9487318600</span>
+                      </div>
+                    </div>
+                  </th>
+                </tr>
+                <tr>
+                  <th colspan="4" class="text-center">
+                    <span><strong>ASSAYING REPORT</strong></span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
+                  <td><strong>Metal</strong></td>
                   <td>${report.metal_type}</td>
+                  <td><strong>SL No.:</strong></td>
+                  <td>${report.serial_no}</td>
+                </tr>
+                <tr>
+                  <td><strong>Name</strong></td>
                   <td>${report.customer_name}</td>
+                  <td><strong>Date:</strong></td>
+                  <td>${new Date(report.assay_date).toLocaleDateString()}</td>
+                </tr>
+                <tr>
+                  <td><strong>Fineness%</strong></td>
                   <td>${report.fineness}</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td><strong>Weight</strong></td>
                   <td>${report.weight}</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td colspan="4" class="small text-muted text-center">Our method is Fire Assay Method as per international standard. Note: We are not responsible forany error in Assaying Results.</td>
                 </tr>
               </tbody>
             </table>
-            <hr>
-            <div style="display: flex; justify-content: space-between;">
-              <div><strong>SL No.:</strong> ${report.serial_no}</div>
-              <div><strong>Date:</strong> ${new Date(report.assay_date).toLocaleDateString()}</div>
-            </div>
-            <div class="footer">
-              <p>Our Method is Five Assay method as per International Standard.</p>
-              <p>Note: We are not responsible for any error in Assaying Results.</p>
-            </div>
           </body>
         </html>
       `);
