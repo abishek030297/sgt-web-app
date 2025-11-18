@@ -3,12 +3,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService, Customer } from '../../services/api.service';
+import { PaymentComponent } from '../payment/payment';
 import * as QRCode from 'qrcode';
 
 @Component({
   selector: 'app-assay-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PaymentComponent],
   templateUrl: './assay-form.html',
   styleUrls: ['./assay-form.css']
 })
@@ -24,6 +25,9 @@ export class AssayFormComponent implements OnInit {
   successMessage = '';
   qrCodeUrl: string = '';
   generatedReportId: number | null = null;
+  showPayment = false;
+  paymentAmount = 0;
+  selectedCustomerId: number | null = null;
 
   constructor() {
     this.assayForm = this.createForm();
@@ -106,7 +110,13 @@ export class AssayFormComponent implements OnInit {
           this.loading = false;
           this.successMessage = response.message;
           this.generatedReportId = response.report.id;
+          this.selectedCustomerId = formData.customer_id;
           this.generateQRCode(response.report.id);
+          
+          // Show payment component after successful report creation
+          this.showPayment = true;
+          // Set payment amount (you can customize this based on your pricing)
+          this.paymentAmount = 50; // $50 or ₹50 for assay service
           
           if (!this.generatedReportId) {
             // Clear form after successful creation (not edit)
@@ -181,5 +191,12 @@ export class AssayFormComponent implements OnInit {
     this.qrCodeUrl = '';
     this.successMessage = '';
     this.generatedReportId = null;
+    this.showPayment = false;
+  }
+
+  onPaymentSuccess(): void {
+    console.log('Payment completed successfully for report:', this.generatedReportId);
+    // Handle post-payment actions here
+    // You can navigate, show confirmation, etc.
   }
 }

@@ -1,0 +1,206 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-1">
+        <i class="fas fa-shopping-cart me-2"></i>Payment History
+      </h2>
+      <p class="text-muted">Track all payments and transactions</p>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card border-success">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Total Revenue</h6>
+          <h3 class="mb-2">{{ formatCurrency(totalRevenue, 'USD') }}</h3>
+          <small class="text-success">{{ successfulPayments }} payments</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card border-warning">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Total Refunded</h6>
+          <h3 class="mb-2">{{ formatCurrency(totalRefunded, 'USD') }}</h3>
+          <small class="text-warning">Refund transactions</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card border-info">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Total Transactions</h6>
+          <h3 class="mb-2">{{ filteredHistory.length }}</h3>
+          <small class="text-info">Filtered results</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card border-danger">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Failed Payments</h6>
+          <h3 class="mb-2">{{ failedPayments }}</h3>
+          <small class="text-danger">Need attention</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  @if (successMessage) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle me-2"></i>
+      {{ successMessage }}
+      <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+    </div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      {{ error }}
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+    </div>
+  }
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="card-title mb-0">Filters</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Search</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Search by customer, payment ID..."
+            [(ngModel)]="searchQuery"
+            (change)="applyFilters()">
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+            <option value="all">All Status</option>
+            <option value="succeeded">Succeeded</option>
+            <option value="failed">Failed</option>
+            <option value="pending">Pending</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Payment Method</label>
+          <select class="form-select" [(ngModel)]="filterMethod" (change)="applyFilters()">
+            <option value="all">All Methods</option>
+            <option value="stripe">Stripe</option>
+            <option value="razorpay">Razorpay</option>
+          </select>
+        </div>
+
+        <div class="col-md-2 mb-3 d-flex align-items-end">
+          <button class="btn btn-outline-secondary w-100" (click)="loadPurchaseHistory()">
+            <i class="fas fa-sync-alt me-1"></i>Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mt-3">Loading purchase history...</p>
+    </div>
+  }
+
+  <!-- Purchase History Table -->
+  @if (!loading && filteredHistory.length > 0) {
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Payment ID</th>
+              <th>Report</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Method</th>
+              <th>Date</th>
+              <th>Refunded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (payment of filteredHistory; track payment.id) {
+              <tr>
+                <td><code class="small">{{ payment.paymentId }}</code></td>
+                <td>
+                  @if (payment.reportId) {
+                    <a href="/report-view/{{ payment.reportId }}">Report #{{ payment.reportId }}</a>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+                <td>{{ payment.customerName }}</td>
+                <td class="fw-bold">{{ formatCurrency(payment.amount, payment.currency) }}</td>
+                <td>
+                  <span [ngClass]="'badge ' + getStatusBadge(payment.status)">
+                    <i [ngClass]="'fas ' + getStatusIcon(payment.status)" class="me-1"></i>
+                    {{ payment.status | uppercase }}
+                  </span>
+                </td>
+                <td>
+                  <span [ngClass]="'badge ' + getMethodBadge(payment.paymentMethod)">
+                    {{ payment.paymentMethod | uppercase }}
+                  </span>
+                </td>
+                <td><small>{{ payment.createdAt | date:'short' }}</small></td>
+                <td>
+                  @if (payment.refundedAmount && payment.refundedAmount > 0) {
+                    <span class="badge bg-warning">{{ formatCurrency(payment.refundedAmount, payment.currency) }}</span>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+                <td>
+                  @if (payment.status === 'succeeded' && !payment.refundId) {
+                    <button class="btn btn-sm btn-outline-warning" (click)="refundPayment(payment)">
+                      <i class="fas fa-undo me-1"></i>Refund
+                    </button>
+                  } @else if (payment.status === 'refunded') {
+                    <span class="text-success"><i class="fas fa-check-circle me-1"></i>Refunded</span>
+                  } @else {
+                    <span class="text-muted small">-</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && filteredHistory.length === 0) {
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No Purchase History</h5>
+        <p class="text-muted mb-0">No transactions found</p>
+      </div>
+    </div>
+  }
+</div>

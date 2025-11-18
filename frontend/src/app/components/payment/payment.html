@@ -1,0 +1,94 @@
+<div class="payment-container">
+  <div class="payment-card">
+    <h2>Process Payment</h2>
+    
+    <div *ngIf="error" class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert alert-success" role="alert">
+      {{ successMessage }}
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="amount" class="form-label">Amount</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input 
+          type="number" 
+          class="form-control" 
+          id="amount" 
+          [(ngModel)]="amount" 
+          [disabled]="loading"
+          min="0.01" 
+          step="0.01"
+          placeholder="0.00"
+        />
+      </div>
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="description" class="form-label">Description</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        id="description" 
+        [(ngModel)]="description"
+        [disabled]="loading"
+        placeholder="Payment description"
+      />
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label">Payment Method</label>
+      <div class="btn-group w-100" role="group">
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="paymentMethod" 
+          id="stripe" 
+          value="stripe"
+          [(ngModel)]="paymentMethod"
+          [disabled]="loading"
+        />
+        <label class="btn btn-outline-primary" for="stripe">
+          Stripe
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="paymentMethod" 
+          id="razorpay" 
+          value="razorpay"
+          [(ngModel)]="paymentMethod"
+          [disabled]="loading"
+        />
+        <label class="btn btn-outline-primary" for="razorpay">
+          Razorpay
+        </label>
+      </div>
+    </div>
+
+    <button 
+      class="btn btn-primary w-100"
+      (click)="processPayment()"
+      [disabled]="loading"
+    >
+      <span *ngIf="!loading">Process Payment</span>
+      <span *ngIf="loading">
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Processing...
+      </span>
+    </button>
+
+    <div class="payment-info mt-4">
+      <h5>Payment Information</h5>
+      <ul class="list-unstyled">
+        <li><strong>Amount:</strong> ${{ amount.toFixed(2) }}</li>
+        <li><strong>Method:</strong> {{ paymentMethod === 'stripe' ? 'Stripe' : 'Razorpay' }}</li>
+        <li><strong>Description:</strong> {{ description }}</li>
+      </ul>
+    </div>
+  </div>
+</div>

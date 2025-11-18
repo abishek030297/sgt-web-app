@@ -40,9 +40,12 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+/changes
 
 # System files
 .DS_Store
 Thumbs.db
 
 /FIXES_APPLIED.md
+/backend/.env
+/backend/.env.example

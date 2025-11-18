@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -33,6 +33,17 @@ export interface DashboardStats {
   recentReports: AssayReport[];
 }
 
+export interface Payment {
+  id: string;
+  customerId: number;
+  reportId?: number;
+  amount: number;
+  currency: string;
+  status: string;
+  gateway: string;
+  createdAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,8 +52,12 @@ export class ApiService {
     private apiUrl = environment.apiUrl;
 
     // Customer methods
-    getCustomers(): Observable<Customer[]> {
-        return this.http.get<Customer[]>(`${this.apiUrl}/customers`);
+    getCustomers(search?: string, sortBy?: string, sortOrder?: string): Observable<Customer[]> {
+        let params = new HttpParams();
+        if (search) params = params.set('search', search);
+        if (sortBy) params = params.set('sortBy', sortBy);
+        if (sortOrder) params = params.set('sortOrder', sortOrder);
+        return this.http.get<Customer[]>(`${this.apiUrl}/customers`, { params });
     }
 
     createCustomer(customer: Omit<Customer, 'id' | 'created_at'>): Observable<any> {
@@ -50,8 +65,12 @@ export class ApiService {
     }
 
     // Assay Report methods
-    getReports(): Observable<AssayReport[]> {
-        return this.http.get<AssayReport[]>(`${this.apiUrl}/reports`);
+    getReports(search?: string, sortBy?: string, sortOrder?: string): Observable<AssayReport[]> {
+        let params = new HttpParams();
+        if (search) params = params.set('search', search);
+        if (sortBy) params = params.set('sortBy', sortBy);
+        if (sortOrder) params = params.set('sortOrder', sortOrder);
+        return this.http.get<AssayReport[]>(`${this.apiUrl}/reports`, { params });
     }
 
     getReportById(id: number): Observable<AssayReport> {

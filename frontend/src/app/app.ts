@@ -12,6 +12,11 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
   title = 'SGT Gold Assay System';
+  dropdownOpen = false;
 
   constructor(public authService: AuthService) {}
+
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
 }

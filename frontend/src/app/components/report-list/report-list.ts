@@ -1,32 +1,40 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService, AssayReport } from '../../services/api.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, UpperCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-report-list',
   standalone: true,
   templateUrl: './report-list.html',
   styleUrls: ['./report-list.css'],
-  imports: [DatePipe] 
+  imports: [DatePipe, UpperCasePipe, FormsModule] 
 })
 export class ReportListComponent implements OnInit {
   private apiService = inject(ApiService);
   private router = inject(Router);
   
   reports: AssayReport[] = [];
+  filteredReports: AssayReport[] = [];
   loading = true;
   message = '';
   messageType: 'success' | 'error' = 'success';
+
+  // Filter properties
+  searchQuery = '';
+  sortBy: 'serial_no' | 'customer_name' | 'metal_type' | 'fineness' | 'weight' | 'assay_date' = 'assay_date';
+  sortOrder: 'asc' | 'desc' = 'desc';
 
   ngOnInit(): void {
     this.loadReports();
   }
 
   loadReports(): void {
-    this.apiService.getReports().subscribe({
+    this.apiService.getReports(this.searchQuery, this.sortBy, this.sortOrder).subscribe({
       next: (reports) => {
         this.reports = reports;
+        this.applyFiltersAndSort();
         this.loading = false;
       },
       error: (error) => {
@@ -34,6 +42,32 @@ export class ReportListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  applyFiltersAndSort(): void {
+    // Server-side filtering and sorting already applied
+    // Just use the data directly
+    this.filteredReports = [...this.reports];
+  }
+
+  onSearchChange(): void {
+    this.loadReports();
+  }
+
+  onSortChange(): void {
+    this.loadReports();
+  }
+
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.loadReports();
+  }
+
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.sortBy = 'assay_date';
+    this.sortOrder = 'desc';
+    this.loadReports();
   }
 
   editReport(report: AssayReport): void {

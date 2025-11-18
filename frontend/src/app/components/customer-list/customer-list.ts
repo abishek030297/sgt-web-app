@@ -14,6 +14,7 @@ export class CustomerListComponent implements OnInit {
   private apiService = inject(ApiService);
   
   customers: Customer[] = [];
+  filteredCustomers: Customer[] = [];
   loading = true;
   showAddForm = false;
   newCustomer: any = {};
@@ -22,14 +23,20 @@ export class CustomerListComponent implements OnInit {
   message = '';
   messageType: 'success' | 'error' = 'success';
 
+  // Filter properties
+  searchQuery = '';
+  sortBy: 'name' | 'phone' | 'email' | 'date' = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
+
   ngOnInit(): void {
     this.loadCustomers();
   }
 
   loadCustomers(): void {
-    this.apiService.getCustomers().subscribe({
+    this.apiService.getCustomers(this.searchQuery, this.sortBy, this.sortOrder).subscribe({
       next: (customers: Customer[]) => {
         this.customers = customers;
+        this.applyFiltersAndSort();
         this.loading = false;
       },
       error: (error: any) => {
@@ -37,6 +44,32 @@ export class CustomerListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  applyFiltersAndSort(): void {
+    // Server-side filtering and sorting already applied
+    // Just use the data directly
+    this.filteredCustomers = [...this.customers];
+  }
+
+  onSearchChange(): void {
+    this.loadCustomers();
+  }
+
+  onSortChange(): void {
+    this.loadCustomers();
+  }
+
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.loadCustomers();
+  }
+
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.sortBy = 'name';
+    this.sortOrder = 'asc';
+    this.loadCustomers();
   }
 
   saveCustomer(): void {

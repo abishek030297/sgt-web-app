@@ -4,8 +4,17 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import paymentsRouter from './routes/payments.js';
 
 dotenv.config();
+
+// Debug: Show environment on startup
+console.log('⚙️  Environment Configuration:');
+console.log('   NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('   PORT:', process.env.PORT || 3000);
+console.log('   DB_HOST:', process.env.DB_HOST || 'localhost');
+console.log('   DB_NAME:', process.env.DB_NAME || 'gold_assay_system');
+console.log('   JWT_SECRET:', process.env.JWT_SECRET ? '✅ Set' : '❌ Not set');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -192,9 +201,27 @@ app.post('/api/login', async (req, res) => {
 // Customer Routes
 app.get('/api/customers', authenticateToken, async (req, res) => {
   try {
+    const { search = '', sortBy = 'name', sortOrder = 'asc' } = req.query;
+    
+    // Build search condition
+    let whereClause = 'user_id = ?';
+    let params = [req.user.userId];
+    
+    if (search) {
+      whereClause += ' AND (name LIKE ? OR phone LIKE ? OR email LIKE ?)';
+      const searchParam = `%${search}%`;
+      params.push(searchParam, searchParam, searchParam);
+    }
+    
+    // Validate and build sort
+    const validSortFields = ['name', 'phone', 'email', 'created_at', 'date'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'name';
+    const sortDir = sortOrder.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+    const orderClause = sortField === 'date' ? `created_at ${sortDir}` : `${sortField} ${sortDir}`;
+    
     const [customers] = await pool.execute(`
-      SELECT * FROM customers WHERE user_id = ? ORDER BY created_at DESC
-    `, [req.user.userId]);
+      SELECT * FROM customers WHERE ${whereClause} ORDER BY ${orderClause}
+    `, params);
 
     res.json(customers);
   } catch (error) {
@@ -312,13 +339,42 @@ app.delete('/api/customers/:id', authenticateToken, async (req, res) => {
 // Assay Reports Routes
 app.get('/api/reports', authenticateToken, async (req, res) => {
   try {
+    const { search = '', sortBy = 'assay_date', sortOrder = 'desc' } = req.query;
+    
+    // Build search condition
+    let whereClause = 'ar.user_id = ?';
+    let params = [req.user.userId];
+    
+    if (search) {
+      whereClause += ' AND (ar.serial_no LIKE ? OR c.name LIKE ? OR ar.metal_type LIKE ?)';
+      const searchParam = `%${search}%`;
+      params.push(searchParam, searchParam, searchParam);
+    }
+    
+    // Validate and build sort
+    const validSortFields = ['serial_no', 'customer_name', 'metal_type', 'fineness', 'weight', 'assay_date'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'assay_date';
+    const sortDir = sortOrder.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+    
+    // Map sort field to actual column name
+    const sortColumnMap = {
+      'serial_no': 'ar.serial_no',
+      'customer_name': 'c.name',
+      'metal_type': 'ar.metal_type',
+      'fineness': 'ar.fineness',
+      'weight': 'ar.weight',
+      'assay_date': 'ar.assay_date'
+    };
+    
+    const orderColumn = sortColumnMap[sortField] || 'ar.assay_date';
+    
     const [reports] = await pool.execute(`
       SELECT ar.*, c.name as customer_name 
       FROM assay_reports ar 
       LEFT JOIN customers c ON ar.customer_id = c.id 
-      WHERE ar.user_id = ? 
-      ORDER BY ar.created_at DESC
-    `, [req.user.userId]);
+      WHERE ${whereClause}
+      ORDER BY ${orderColumn} ${sortDir}
+    `, params);
 
     res.json(reports);
   } catch (error) {
@@ -801,6 +857,9 @@ app.delete('/api/reports/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
+
+// Payment Routes
+app.use('/api/payments', paymentsRouter);
 
 // 404 handler for undefined routes
 app.use('/api/*', (req, res) => {
